@@ -1,11 +1,12 @@
-1. C 和 C++ 区别
-===
+
+1.C 和 C++ 区别
+----
 C++是在C语言的基础上开发的一种面向对象编程语言，C++支持多种编程范式 －－面向对象编程、泛型编程和过程化编程。常用于系统开发，引擎开发等应用领域，支持类：类、封装、重载等特性!
 
 c++在c的基础上增添类，C是一个结构化语言，它的重点在于算法和数据结构。C程序的设计首要考虑的是如何通过一个过程，对输入（或环境条件）进行运算处理得到输出（或实现过程（事务）控制），而对于C++，首要考虑的是如何构造一个对象模型，让这个模型能够契合与之对应的问题域，这样就可以通过获取对象的状态信息得到输出或实现过程（事务）控制。
 
-2. const 有什么用途
-===
+2.const 有什么用途
+----
  主要有三点： 1：定义只读变量，即常量（类成员变量和普通变量） 
          2：修饰函数的参数和函数的返回值 
          3： const修饰类成员函数，承诺在本函数内部不会修改类内的数据成员，不会调用其它非 const 成员函数。
@@ -610,27 +611,4 @@ class MyClassB:public MyClass
     int varB;
 public:
     virtual void fun()
-    {}
-    virtual void funB()
-    {}
-};
-class MyClassC:public MyClassA,public MyClassB
-{
-    int varC;
-public:
-    virtual void funB()
-    {}
-virtual void funC()
-    {}
-};
-``` 
-
-52、虚继承
----
-虚拟继承是为了解决多重继承下公共基类的多份拷贝问题。比如上边的例子中MyClassC的对象内包含MyClassA和MyClassB子对象，但是MyClassA和MyClassB内含有共同的基类MyClass。为了消除MyClass子对象的多份存在，我们需要让MyClassA和MyClassB都虚拟继承于MyClass，然后再让MyClassC多重继承于这两个父类。
-class MyClassA:virtual public MyClass
-	class MyClassB:virtual public MyClass
-	class MyClassC:public MyClassA,public MyClassB
-53、为什么基类指针指向派生类对象时可以调用派生类成员函数
----
-多态是在程序进行动态绑定得以实现的，而不是编译时就确定对象的调用方法的静态绑定。程序运行到动态绑定时，通过基类的指针所指向的对象类型，强制类型转换为基类对象，也就是说子类可能有100字节，但是基类指针只匹配前30字节，这30字节的内存分布和基类是一样的（从内存分布中也能看到，*(pc+0)[0]()都指向的是第一个虚函数），虚函数表指针vptr的初始化是动态的，也就是说绑定时间就是函数执行到这个语句的时间，	所以就能根据不同的调用，执行不同的函数。
+    
