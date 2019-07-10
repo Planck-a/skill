@@ -340,8 +340,11 @@ C语言中的存储类型有auto，extern，register，static四种
 
 智能指针防止内存泄漏的原理？
 ---
-常用的智能指针介绍？
+
+常用的智能指针介绍？ 两个智能指针相互引用造成的内存泄漏原理？
 ---
+https://github.com/Planck-a/skill/blob/master/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88.md
+
 21.exrern关键字的作用？      
 ---
 答：一、 C++中调用C编译好的函数，通过extern "C" void fun(int a, int b)，告诉c++编译器在编译时按照c格式进行编译。C++语言支持函数重载，C语言不支持函数重载，函数被C++编译器编译后在库中的名字与C语言的不同，假设某个函数原型为：
