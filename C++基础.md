@@ -438,6 +438,7 @@ http://blog.csdn.net/zsf8701/article/details/7844316
 
 32 C++11 新特性 之右值引用、移动拷贝、移动赋值
 ---
+https://github.com/Planck-a/skill/blob/master/C%2B%2B11%E6%96%B0%E7%89%B9%E6%80%A7.md
 
 32 什么时候需要初始化成员列表？必须在构造函数初始化式里进行初始化的数据成员有哪些？
 ---
