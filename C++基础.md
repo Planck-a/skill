@@ -403,22 +403,22 @@ set：其内部元素会根据元素的键值自动被排序。区别于map，�
 
 26.线程和进程的联系和区别
 ---
-      http://blog.csdn.NET/wolenski/article/details/7969908
+http://blog.csdn.NET/wolenski/article/details/7969908
 27.线程有哪几种状态
 ---	
-     http://blog.csdn.Net/wolenski/article/details/7969908
+http://blog.csdn.Net/wolenski/article/details/7969908
  
 28.进程间的通信方式
 ---
-     管道、命管道、信号量、共享内存、消息队列
+管道、命管道、信号量、共享内存、消息队列
 29.线程同步和线程互斥的区别
 ---
-    http://blog.csdn.net/wolenski/article/details/7969908
+http://blog.csdn.net/wolenski/article/details/7969908
  
 30.线程同步的方式
 ---
-     Linux:   互斥锁、条件变量和信号量
-     http://blog.csdn.net/zsf8701/article/details/7844316
+Linux:   互斥锁、条件变量和信号量
+http://blog.csdn.net/zsf8701/article/details/7844316
  
 31 深拷贝和浅拷贝
 ---
