@@ -95,6 +95,18 @@ delete[]mTest2;//-4-  报错
 ```
 这就说明：对于内建简单数据类型，delete和delete[]功能是相同的。对于自定义的复杂数据类型，delete和delete[]不能互用。delete[]删除一个数组，delete删除一个指针。简单来说，用new分配的内存用delete删除；用new[]分配的内存用delete[]删除。delete[]会调用数组元素的析构函数。内部数据类型没有析构函数，所以问题不大。如果你在用delete时没用括号，delete就会认为指向的是单个对象，否则，它就会认为指向的是一个数组。
 
+new和delete的底层实现
+---
+operator new/operator delete、operator new[]/operator delete[]与malloc/free用法一样。 
+
+实际上operator new/operator delete是malloc/free的一层封装。负责分配空间/释放空间，同时调用构造函数和析构函数来初始化/清理对象。 
+
+new 做了两件事 ：
+
+1. 调用operator new分配空间。 
+
+2. 调用构造函数初始化对象。
+
 5.复杂数据类型解释
 ---
 `
