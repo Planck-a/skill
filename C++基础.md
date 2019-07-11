@@ -725,36 +725,8 @@ _onexit_t _func{
 ```
 51、虚函数、多重继承和虚继承
 ---
-```cpp
-虚函数：
-class MyClass
-{
-    int var;
-public:
-    virtual void fun(){}
-    void funfunc(){}
-};   普通函数不在类中分配内存
-```
-（2）继承中虚函数表
+[虚函数和虚继承](https://github.com/Planck-a/skill/blob/master/C%2B%2B/%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E7%BB%A7%E6%89%BF.md)
 
-class MyClassA:public MyClass
-{
-    int varA;
-public:
-    virtual void fun()
-    {}
-    virtual void funA()
-    {}
-};
-
-（3）多重继承
-```cpp
-class MyClassB:public MyClass
-{
-    int varB;
-public:
-    virtual void fun()
-```
 52 C++11支持的四种类型转换
 ---
 static_cast, dynamic_cast, const_cast, reinterpret_cast
