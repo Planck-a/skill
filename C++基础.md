@@ -1016,4 +1016,46 @@ int main()
 4、特化与偏特化的调用顺序
 
 对于模板、模板的特化和模板的偏特化都存在的情况下，编译器在编译阶段进行匹配时，是如何抉择的呢？从哲学的角度来说，应该先照顾最特殊的，然后才是次特殊的，最后才是最普通的。也就是哪个最优匹配，就选择哪个；如果都不匹配，那就选择通用的。编译器进行抉择也是尊从的这个道理。
-    
+  
+54 三个线程循环打印ABC
+---
+```CPP
+#include <iostream>
+#include <thread>
+#include <condition_variable>
+#include <vector>
+#include <algorithm>
+ 
+std::mutex mtx;
+std::condition_variable cvar;
+char g_ch = 0;
+ 
+void print_fun(char ch)
+{
+	int cyle_cnt = 10;
+	char ch_ = ch - 'A';
+ 
+	for (int i = 0; i < cyle_cnt; i++)
+	{
+		std::unique_lock<std::mutex>ulk(mtx);
+		cvar.wait(ulk, [ch_] {return ch_ == g_ch; });
+		std::cout << (char)(ch_ + 'A');
+		g_ch = (ch_ + 1) % 3;
+		ulk.unlock(); 
+		cvar.notify_all();
+	}
+} 
+int main()
+{
+	std::vector<std::thread> threads;
+	threads.push_back(std::thread(print_fun, 'A'));
+	threads.push_back(std::thread(print_fun, 'B'));
+	threads.push_back(std::thread(print_fun, 'C'));
+ 
+	std::for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
+ 
+	std::cout << std::endl; 
+	system("pause"); 
+	return 0;
+ }
+```
