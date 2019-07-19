@@ -1083,3 +1083,59 @@ int main()
 内建数据类型的情况，效率没有区别。 只有自定义数据类型的情况，++i效率较高。
 
 解释：对于类对象的++i，因为前缀式（++i）可以直接返回对象的引用，而后缀式（i++）必须产生一个临时对象保存更改前对象并返回，(实现过自定义类型++运算符定义的就知道)，所以导致在大对象的时候会额外产生临时对象，产生了较大的复制开销，引起效率降低，因此处理使用者自定义类型（注意不是指内建类型）的时候，应该尽可能的使用前缀式地增/递减。
+
+57、函数返回局部变量问题
+---
+返回 数值没有问题！在C中，16bit程序中，返回值保存在ax寄存器中，32bit程序中，返回值保持在eax寄存器中，如果是64bit返回值，edx寄存器保存高32bit，eax寄存器保存低32bit。 综上，函数是可以将临时变量的值作为返回值的。
+
+返回 字符常量区指针没有问题
+返回 栈区字符指针乱码！
+返回 static没有问题！
+返回指向全局变量 没有问题！
+```
+#include <stdio.h>   
+char *returnStr()   
+{   
+    char *p="hello world!";   //字符常量区
+    return p;   
+}   
+int main()   
+{   
+    char *str;   
+    str=returnStr();   
+    printf("%s\n", str);   //显示不会报错
+    return 0;   
+}  
+
+#include <stdio.h>   
+char *returnStr()   
+{   
+    char p[]="hello world!";   //栈区
+    return p;   //返回会显示乱码
+}   
+int main()   
+{   
+    char *str;   
+    str=returnStr();   
+    printf("%s\n", str);   
+    return 0;   
+} 
+
+
+#include <stdio.h>   
+char *returnStr()   
+{   
+    static char p[]="hello world!";   
+        //声明为static可解决上述问题，同理返回数组也要声明为static
+    return p;   
+}   
+int main()   
+{   
+    char *str;   
+     str=returnStr();   
+    printf("%s\n", str);   
+  
+    return 0;   
+}   
+```
+
