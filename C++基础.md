@@ -1138,4 +1138,10 @@ int main()
     return 0;   
 }   
 ```
+58、rand()和srand()
+---
+rand()要产生0-99的随机数：rand()%100
 
+srand() 用来设置 rand() 产生随机数时的随机数种子，srand(unsigned int seed),如果每次 seed 都设相同值，rand() 所产生的随机数值每次就会一样。
+
+一般会设置成 srand(time(0))，来产生不同的随机种子
