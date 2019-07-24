@@ -518,7 +518,7 @@ http://blog.csdn.net/zsf8701/article/details/7844316
 
 32 C++11 新特性 之右值引用、移动拷贝、移动赋值
 ---
-https://github.com/Planck-a/skill/blob/master/C%2B%2B11%E6%96%B0%E7%89%B9%E6%80%A7.md
+[为什么需要右值引用？](https://github.com/Planck-a/skill/blob/master/C%2B%2B11%E6%96%B0%E7%89%B9%E6%80%A7.md)
 
 32 什么时候需要初始化成员列表？必须在构造函数初始化式里进行初始化的数据成员有哪些？
 ---
@@ -603,6 +603,7 @@ int main()
 - A( int 1) 
 - A()
 - A(int 2)
+
 能看出，对于在初始化列表就构造的对象a，并没有调用默认的构造函数，只是调用了自己写的构造函数；而对于在构造函数中才初始化的对象b，先会调用一次默认的A构造函数，然后才会调用自己写的构造函数。
 
 
