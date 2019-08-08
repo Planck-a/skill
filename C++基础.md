@@ -6,11 +6,99 @@ C++是在C语言的基础上开发的一种面向对象编程语言，C++支持�
 c++在c的基础上增添类，C是一个结构化语言，它的重点在于算法和数据结构。C程序的设计首要考虑的是如何通过一个过程，对输入（或环境条件）进行运算处理得到输出（或实现过程（事务）控制），而对于C++，首要考虑的是如何构造一个对象模型，让这个模型能够契合与之对应的问题域，这样就可以通过获取对象的状态信息得到输出或实现过程（事务）控制。
 
 
-补1 设计模式懂嘛，简单举个例子？
+2 设计模式懂嘛，简单举个例子？
 ---
 设计模式（Design pattern）是一套被反复使用、多数人知晓的、经过分类编目的、代码设计经验的总结。
 比如单例模式，保证一个类仅有一个实例，并提供一个访问它的全局访问点。适用于：当类只能有一个实例而且客户可以从一个众所周知的访问点访问它时；当这个唯一实例应该是通过子类化可扩展的，并且客户应该无需更改代码就能使用一个扩展的实例时。
 比如工厂模式，定义一个用于创建对象的接口，让子类决定实例化哪一个类。Factory Method 使一个类的实例化延迟到其子类。适用于：当一个类不知道它所必须创建的对象的类的时候；当一个类希望由它的子类来指定它所创建的对象的时候；当类将创建对象的职责委托给多个帮助子类中的某一个，并且你希望将哪一个帮助子类是代理者这一信息局部化的时候。
+
+单例模式
+---
+懒汉式
+构造函数私有化。private
+提供一个全局访问点public。。
+创建静态成员变量。每一次调用全局访问点的时候，都要判断该成员变量。
+```
+class LazySingleton {
+    //懒汉式单例模式
+    //比较懒，在类加载时，不创建实例，因此类加载速度快，但运行时获取对象的速度慢
+    //c+＋的构造函数，不能保证是线程安全的。
+ private： LazySingleton()
+    {
+        //私有构造函数
+    }
+ private ：static LazySingleton *intance = null;//静态私用成员，没有初始化   
+ public ：
+     LazySingleton *LazySingleton getInstance()    //静态，同步，公开访问点
+    {
+        if(intance == null)
+        {
+            intance = new LazySingleton();
+            static CGarhuishou cl;//释放的时机
+        }
+        return intance;
+    }
+    class CGarhuishou//类中套类，用来释放对象
+    {
+        ~CGarhuishou()
+        {
+            if(LazySingleton::intance)
+            {
+                delete LazySingleton::intance;
+                LazySingleton::intance=NULL;
+            }
+        }
+    }
+    
+
+}
+LazySingleton *LazySingleton::intance=null;
+
+
+void main()
+{
+    LazySingleton *myp1=LazySingleton::getInstance();
+    LazySingleton *myp2=LazySingleton::getInstance();//返回的是同一个对象
+}
+```
+懒汉式遇上多线程怎么办？
+---
+多个线程有可能创建多个对象，解决办法有两个：
+
+一：饿汉式(不推荐)
+
+缺点：创建类成员时直接new，提前创建 不满足业务需求
+
+LazySingleton *LazySingleton::intance=new LazySingleton ;
+
+二：加锁（必问）两次检查原理：第一次查有没有实例，第二次查有没有🔒
+```
+class LazySingleton {
+public ：
+     static LazySingleton * getInstance()    //静态，同步，公开访问点
+    {
+        if(intance == null)//双重锁定，第一次查有没有实例
+        {
+            std::unique_lock<std::mutex> myGuard(mymutex);//第二次查有没有🔒
+            if(intance == null)
+            {
+                intance = new LazySingleton();
+                static CGarhuishou cl;//释放的时机
+            }  
+        }
+        return intance;
+    }
+}
+void mythread()
+{
+    LazySingleton *myp1=LazySingleton::getInstance();
+}
+void main()
+{
+    std::thread myobj1(mythread);
+    std::thread myobj2(mythread);
+}
+```
 
 4.指针和引用的区别
 ---
@@ -451,6 +539,14 @@ int (*p)(int)//函数指针`
 
 成员类对象的构造函数：如果类的变量中包含其他类（类的组合），需要在调用本类构造函数前先调用成员类对象的构造函数，调用顺序遵照在类中被声明的顺序。
 派生类的构造函数。析构函数与之相反。
+
+拷贝构造函数如果用值传递会有什么影响？
+---
+答：会形成死循环；举例用s1初始s2的过程，s1---->st(形参)---->s2
+
+当给s2初始化的时候调用了s2的拷贝构造函数，由于是值传递，系统会给形参st重新申请一段空间，然后调用自身的拷贝构造函数把s1的数据成员的值传给st。当s1调用自身的拷贝构造函数的时候又因为是值传递，所以。。。
+
+也就是说，只要调用拷贝构造函数，就会重新申请一段空间，只要重新申请一段空间，就会调用拷贝构造函数，这样一直下去就形成了一个死循环。所以拷贝构造函数一定不能是值传递。
 
 16、多态，虚函数，纯虚函数
 ---
@@ -1726,3 +1822,55 @@ rand()要产生0-99的随机数：rand()%100
 srand() 用来设置 rand() 产生随机数时的随机数种子，srand(unsigned int seed),如果每次 seed 都设相同值，rand() 所产生的随机数值每次就会一样。
 
 一般会设置成 srand(time(0))，来产生不同的随机种子
+
+52 程序分析题
+---
+（1）请问运行Test函数会有什么样的结果？
+```
+void GetMemory(char *p)
+{
+   p=(char*)malloc(100);
+}
+
+void Test(void)
+{
+ char *str = NULL;
+ GetMemory(str);
+ strcpy(str,"helloworld");
+ printf(str);
+}
+```
+答：程序崩溃。因为GetMemory并不能传递动态内存，Test函数中的str一直都是NULL。strcpy(str,"helloworld");将使程序崩溃。p参数是复制原有指针的值，而不是原来的指针，所以即使p重新指向新的地址，但原来的指针指向的地址不变。
+
+(2)请问运行Test函数会有什么样的结果？
+```
+char *GetMemory(void)
+{
+ char p[]="helloworld";
+ return p;
+}
+void Test(void)
+{
+ char *str = NULL;
+ str = GetMemory();
+ printf(str);
+}
+```
+答：可能是乱码。因为GetMemory返回的是指向“栈内存”的指针，该指针的地址不是NULL，但其原先的内容已经被清除，新内容不可知。p是局部变量，在离开作用域后栈空间会被回收，结果不可预料。
+
+(3)请问运行Test函数会有什么样的结果？
+```
+void GetMemory2(char **p, int num)
+{
+ *p = (char*)malloc(num);
+}
+void Test(void)
+{
+ char *str = NULL;
+ GetMemory(&str, 100);
+ strcpy(str, "hello");
+ printf(str);
+}
+```
+请问运行Test函数会有什么样的结果？
+答：（1）能够输出hello（2）内存泄漏     p是指向传入的指针的指针，*p为传入的指针赋值，所以改变了传入指针的值，
