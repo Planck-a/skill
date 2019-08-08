@@ -141,6 +141,7 @@ p = nullptr;//释放内存后指针置空
 C++中有了malloc / free , 为什么还需要 new / delete   
 ---
   malloc与free是C++/C语言的标准库函数，new/delete是C++的运算符。它们都可用于申请动态内存和释放内存。
+  
 a、对象在创建的同时要自动执行构造函数，对象在消亡之前要自动执行析构函数。 由于malloc/free是库函数而不是运算符，不能做到自动执行构造析构。
 
 b、对于非内部数据类型的对象而言，光用maloc/free无法满足动态对象的要求。new可以创建复杂数据类型，而malloc只能给系统数据类型分配内存。
@@ -165,7 +166,11 @@ delete[]mTest2;//-4-  报错
 
 new和delete的底层实现
 ---
-operator new/operator delete、operator new[]/operator delete[]与malloc/free用法一样。 
+当我们在程序中写下 new 和 delete 时，我们实际上调用的是 C++ 语言内置的 new operator 和 delete operator。以 new operator 为例，它总是先分配足够的内存，而后再调用相应的类型的构造函数初始化该内存。new operator 为分配内存所调用的函数名字是 operator new，其通常的形式是 void * operator new(size_t size); 其返回值类型是 void*，参数 size 确定分配多少内存，你能增加额外的参数重载函数 operator new，但是第一个参数类型必须是 size_t。
+
+这里有一个问题，就是当我们调用 new operator 分配内存时，有一个 size 参数表明需要分配多大的内存。但是当调用 delete operator 时，却没有类似的参数，那么 delete operator 如何能够知道需要释放该指针指向的内存块的大小呢？答案是：对于系统自有的数据类型，语言本身就能区分内存块的大小，而对于自定义数据类型（如我们自定义的类），则 operator new 和 operator delete 之间需要通过cookie互相传递信息。当我们使用 operator new 为一个自定义类型对象分配内存时，实际上我们得到的内存要比实际对象的内存大一些，这些内存除了要存储对象数据外，还需要记录这片内存的大小，此方法称为 cookie。
+
+当我们为数组分配/释放内存时，虽然我们仍然使用 new operator 和 delete operator，但是其内部行为却有不同：new operator 调用了operator new 的数组版的兄弟－ operator new[]，而后针对每一个数组成员调用构造函数。
 
 实际上operator new/operator delete是malloc/free的一层封装。负责分配空间/释放空间，同时调用构造函数和析构函数来初始化/清理对象。 
 
@@ -174,6 +179,53 @@ new 做了两件事 ：
 1. 调用operator new分配空间。 
 
 2. 调用构造函数初始化对象。
+
+基于new和delete的底层，内存泄漏检测的原理？
+---
+要想检测内存泄漏，就必须对程序中的内存分配和释放情况进行记录，所能够采取的办法就是首先重载所有形式的operator new 和 operator delete，截获 new operator 和 delete operator 执行过程中的内存操作信息。然后在全局记录申请和释放信息，程序运行结束时打印。
+
+四个重载函数为：
+```
+void* operator new( size_t nSize, char* pszFileName, int nLineNum )
+void* operator new[]( size_t nSize, char* pszFileName, int nLineNum )
+void operator delete( void *ptr )
+void operator delete[]( void *ptr )
+```
+在operator new函数，除了必须的 size_t nSize 参数外，还增加了文件名和行号，这个信息将在发现内存泄漏时输出，以帮助用户定位泄漏具体位置。对于全局堆内存申请记录，这里所采用的数据结构是一个 STL 的 map，以指针值为 key 值，文件名和行号信息为value。当 operator delete 被调用时，如果调用方式正确的话，我们就能以传入的指针值在 map 中找到相应的数据项并将之删除，而后调用 free 将指针所指向的内存块释放。当程序退出的时候，map 中的剩余的数据项就是我们企图检测的内存泄漏信息－－已经在堆上分配但是尚未释放的分配信息。
+
+对于重载函数：我们用过宏替换，将之前缺省的 new operato 替换为new (__FILE__,__LINE__) 调用，#define new  new(__FILE__, __LINE__ )
+
+对于全局map：用于管理客户信息的这个 map 必须在客户程序第一次调用 new operator 或者 delete operator 之前被创建，而且在最后一个 new operator 和 delete operator 调用之后进行泄漏信息的打印，也就是说它需要先于程序而出生，而在程序退出之后进行分析。所以必须将其设计为全局对象。设计一个类来封装这个 map 以及这对它的插入删除操作，然后构造这个类的一个全局对象（appMemory），在全局对象（appMemory）的构造函数中创建并初始化这个数据结构，而在其析构函数中对数据结构中剩余数据进行分析和输出。
+
+Operator new 中将调用这个全局对象（appMemory）的 insert 接口将指针、文件名、行号、内存块大小等信息以指针值为 key 记录到 map 中，在 operator delete 中调用 erase 接口将对应指针值的 map 中的数据项删除。注意不要忘了对 map 的访问需要进行互斥同步，因为同一时间可能会有多个线程进行堆上的内存操作。
+
+最后，为了让用户能够方便的 enable 和 disable 这个内存检测功能，毕竟内存泄漏的检测应该在程序的调试和测试阶段完成。我们可以使用条件编译的特性，在用户被检测文件中使用如下宏定义来实现开关功能：
+```
+#if defined( MEM_DEBUG )
+#define new new(__FILE__, __LINE__ )
+```
+malloc的原理，brk系统调用干什么的，mmap呢？
+---
+参考：https://blog.csdn.net/gfgdsg/article/details/42709943
+
+内核数据结构mm_struct中的成员变量start_code和end_code是进程代码段的起始和终止地址，start_data和 end_data是进程数据段的起始和终止地址，start_stack是进程堆栈段起始地址，
+ulimit-s可以查看系统栈内存大小。start_brk是进程动态内存分配起始地址（堆的起始地址），还有一个 brk（堆的当前最后地址），就是动态内存分配当前的终止地址。
+
+A=malloc(40k)，当申请的大小小于128k时，内部是调用的brk，把堆内存截止地址向高内存扩40k；
+B=malloc(100k)，仍然是调用brk，在A的基础上堆内存截止地址向高内存扩100k；
+注意只是改变终止地址，并没有映射！只有在真正访问一个地址的时候才建立这个地址的物理映射。
+注：brk()是一个非常简单的系统调用，只是简单地改变mm_struct结构的成员变量brk的值。
+
+C=malloc(200k),此时调用的是mmap，是在堆和栈中间选择200k给C，而不是按顺序在B上分配；
+这时free(C)，可以直接把这部分内存稀释掉，但是在B析构之前，析构A的话，A对应的虚拟内存和物理内存都没有释放,因为只有一个_edata指针，如果往回推，那么B这块内存怎么办呢？
+注：mmap系统调用实现了更有用的动态内存分配功能，可以将一个磁盘文件的全部或部分内容映射到用户空间中
+
+
+这时A和B连起来，就有140k的内存，当可用的空闲内存组合起来超过128k时，才会执行内存紧缩，将_edata回调到A之前。否则，这部分并没有释放掉，在下次申请内存小于128k时，直接分配给调用者。
+
+为什么brk申请的内存不能直接释放，为什么不用mmap全部分配呢？而是仅仅对于大于 128k 的大块内存才使用 mmap ？ 
+答：进程向 OS 申请和释放地址空间会产生很多系统调用，过多的系统调用会消耗内存。是一个连续空间，并且堆内碎片由于没有归还 OS ，如果可重用碎片，再次访问该内存很可能不需产生任何系统调用和缺页中断，这将大大降低 CPU 的消耗。
+
 
 5.this 指针
 ---
