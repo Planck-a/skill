@@ -477,6 +477,46 @@ Is it legal (and moral) for a member function to say delete this?
 - 必须保证成员函数的 delete this 后面没有调用 this 了
 - 必须保证 delete this 后没有人使用了
 
+
+空指针调用类成员函数会发生什么？this指针详解
+---
+```
+#include<iostream>
+using namespace std;
+ 
+class TestNullPtr {
+public:
+    void print() {
+        cout << "print" << endl;
+    }
+ 
+    void getA() {
+        cout << a << endl;
+    }
+ 
+    virtual test() {
+        cout << "test" << endl;
+    }
+ 
+private:
+    int a = 100;
+}
+
+int main() {
+    TestNullPtr* ptr = nullptr;
+    ptr->print(); //运行结果成功执行并正确打印;
+    ptr->getA();//程序虽然不会编译报错，但返回的是一个错误码，也没有正常执行：
+    ptr->test();//调用test虚方法,程序可以运行，但是返回错误码，没有执行对应代码：
+}
+```
+那为什么同一个类的不同对象调用对应成员函数可以出现不同的结果？
+
+答案就是this指针。
+
+共有的成员函数体之所以能够把不同对象的数据区分开来，靠的是隐式传递给成员函数的this指针，成员函数中对成员变量的访问都是转化成"this->数据成员"的方式。因此，从这一角度说，成员函数与普通函数一样，只是多了一个隐式参数，即指向对象的this指针。
+
+因此当所调用的成员函数有需要访问对象元素(getA)或者更改对象元素值(setA)时，由于没有this指针(因为现在this指针指向的是nullptr)，就会导致不能正确执行。同理，因为虚方法的调用是依赖于this指针的，所以同样会产生错误。
+
 13.复杂数据类型解释
 ---
 `
@@ -1049,6 +1089,18 @@ inline virtual 唯一可以内联的时候是：编译器知道所调用的对�
 
 27.exrern关键字的作用？      
 ---
+```
+#ifndef __INCvxWorksh
+#define __INCvxWorksh 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+/*...*/ 
+#ifdef __cplusplus
+}
+#endif 
+#endif /* __INCvxWorksh */
+```
 答：一、 C++中调用C编译好的函数，通过extern "C" void fun(int a, int b)，告诉c++编译器在编译时按照c格式进行编译。C++语言支持函数重载，C语言不支持函数重载，函数被C++编译器编译后在库中的名字与C语言的不同，假设某个函数原型为：
           void foo(int x, inty);
 	  
