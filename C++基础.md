@@ -1092,7 +1092,7 @@ inline virtual 唯一可以内联的时候是：编译器知道所调用的对�
 ```
 #ifndef __INCvxWorksh
 #define __INCvxWorksh 
-#ifdef __cplusplus
+#ifdef __cplusplus              //为了在c语言中调用c++
 extern "C" {
 #endif 
 /*...*/ 
@@ -1102,9 +1102,10 @@ extern "C" {
 #endif /* __INCvxWorksh */
 ```
 答：一、 C++中调用C编译好的函数，通过extern "C" void fun(int a, int b)，告诉c++编译器在编译时按照c格式进行编译。C++语言支持函数重载，C语言不支持函数重载，函数被C++编译器编译后在库中的名字与C语言的不同，假设某个函数原型为：
-          void foo(int x, inty);
+
+   void foo(int x, inty);
 	  
-该函数被C编译器编译后在库中的名字为:  _foo。而C++编译器则会产生像: _foo_int_int之类的名字。为了解决此类名字匹配的问题，C++提供了C链接交换指定符号 extern "C"。
+该函数被C编译器编译后在库中的名字为:  _foo。而C++编译器则会产生像: _foo_int_int之类的名字。_foo_int_int这样的名字包含了函数名和函数参数数量及类型信息，C++就是靠这种机制来实现函数重载的。 为了实现C和C++的混合编程，C++提供了C连接交换指定符号extern "C"来解决名字匹配问题，函数声明前加上extern "C"后，则编译器就会按照C语言的方式将该函数编译为_foo，这样C语言中就可以调用C++的函数了。
 
 二、extern修饰变量或者函数，作用是声明函数或者变量的作用范围，如A模块中的 extern int g_Int，只要在B模块包含了A的头文件，那么B就可以正常使用，在编译阶段起作用。但是有一点要注意，在使用extern时候要严格对应声明时的格式，比如A中定义char a[6]，B中定义extern char *a，那么会报错，因为没有严格匹配。
 
