@@ -6,7 +6,7 @@ C++是在C语言的基础上开发的一种面向对象编程语言，C++支持�
 c++在c的基础上增添类，C是一个结构化语言，它的重点在于算法和数据结构。C程序的设计首要考虑的是如何通过一个过程，对输入（或环境条件）进行运算处理得到输出（或实现过程（事务）控制），而对于C++，首要考虑的是如何构造一个对象模型，让这个模型能够契合与之对应的问题域，这样就可以通过获取对象的状态信息得到输出或实现过程（事务）控制。
 
 
-2 设计模式懂嘛，简单举个例子？
+2 设计模式
 ---
 设计模式（Design pattern）是一套被反复使用、多数人知晓的、经过分类编目的、代码设计经验的总结。
 比如单例模式，保证一个类仅有一个实例，并提供一个访问它的全局访问点。适用于：当类只能有一个实例而且客户可以从一个众所周知的访问点访问它时；当这个唯一实例应该是通过子类化可扩展的，并且客户应该无需更改代码就能使用一个扩展的实例时。
@@ -165,6 +165,20 @@ delete[]mTest2;//-4-  报错
 ```
 这就说明：对于内建简单数据类型，delete和delete[]功能是相同的。对于自定义的复杂数据类型，delete和delete[]不能互用。delete[]删除一个数组，delete删除一个指针。简单来说，用new分配的内存用delete删除；用new[]分配的内存用delete[]删除。delete[]会调用数组元素的析构函数。内部数据类型没有析构函数，所以问题不大。如果你在用delete时没用括号，delete就会认为指向的是单个对象，否则，它就会认为指向的是一个数组。
 
+7 什么是内存泄漏？面对内存泄漏和指针越界，你有哪些方法？你通常采用哪些方法来避免和减少这类错误？
+---
+答：用动态存储分配函数动态开辟的空间，在使用完毕后未释放，结果导致一直占据该内存单元即为内存泄露。比如new之后忘记delete，比如基类对象没有虚析构函数，delete只是delete基类对象而没有析构子类，也会内存泄漏。
+
+* 使用的时候要记得指针的长度。
+* malloc的时候得确定在那里free.
+* 对指针赋值的时候应该注意被赋值指针需要不需要释放.
+* 动态分配内存的指针最好不要再次赋值.
+
+在 linux 或者 unix 下，我们的 C++ 程序缺乏相应的手段来检测内存信息，而只能使用 top 指令观察进程的动态内存总额。而且程序退出时，我们无法获知任何内存泄漏信息。为了更好的辅助在 linux 下程序开发，我们在我们的类库项目中设计并实现了一个内存检测子系统。基于 C++ 中的 new 和 delete 的基本原理，可以实现内存泄漏的检测。
+
+
+7.1 内存检测的基本实现原理
+---
 new和delete的底层实现
 ---
 当我们在程序中写下 new 和 delete 时，我们实际上调用的是 C++ 语言内置的 new operator 和 delete operator。以 new operator 为例，它总是先分配足够的内存，而后再调用相应的类型的构造函数初始化该内存。new operator 为分配内存所调用的函数名字是 operator new，其通常的形式是 void * operator new(size_t size); 其返回值类型是 void*，参数 size 确定分配多少内存，你能增加额外的参数重载函数 operator new，但是第一个参数类型必须是 size_t。
@@ -205,41 +219,6 @@ Operator new 中将调用这个全局对象（appMemory）的 insert 接口将�
 #if defined( MEM_DEBUG )
 #define new new(__FILE__, __LINE__ )
 ```
-
-
-7 什么是内存泄漏？面对内存泄漏和指针越界，你有哪些方法？你通常采用哪些方法来避免和减少这类错误？
----
-答：用动态存储分配函数动态开辟的空间，在使用完毕后未释放，结果导致一直占据该内存单元即为内存泄露。比如new之后忘记delete，比如基类对象没有虚析构函数，delete只是delete基类对象而没有析构子类，也会内存泄漏。
-
-* 使用的时候要记得指针的长度。
-* malloc的时候得确定在那里free.
-* 对指针赋值的时候应该注意被赋值指针需要不需要释放.
-* 动态分配内存的指针最好不要再次赋值.
-
-在 linux 或者 unix 下，我们的 C++ 程序缺乏相应的手段来检测内存信息，而只能使用 top 指令观察进程的动态内存总额。而且程序退出时，我们无法获知任何内存泄漏信息。为了更好的辅助在 linux 下程序开发，我们在我们的类库项目中设计并实现了一个内存检测子系统。基于 C++ 中的 new 和 delete 的基本原理，可以实现内存泄漏的检测。
-（1）New和delete的原理
----
-当我们在程序中写下 new 和 delete 时，我们实际上调用的是 C++ 语言内置的 new operator 和 delete operator。以 new operator 为例，它总是先分配足够的内存，而后再调用相应的类型的构造函数初始化该内存。我们能够施加影响力的事实上就是 new operator 和 delete operator 执行过程中分配和释放内存的方法。
-
-new operator 为分配内存所调用的函数名字是 operator new，其通常的形式是 void * operator new(size_t size); 其返回值类型是 void，这个函数返回一个未经初始化的内存。参数 size 确定分配多少内存，你能增加额外的参数重载函数 operator new，但是第一个参数类型必须是 size_t。
-
-这里有一个问题，就是当我们调用 new operator 分配内存时，有一个 size 参数表明需要分配多大的内存。但是当调用 delete operator 时，却没有类似的参数，那么 delete operator 如何能够知道需要释放该指针指向的内存块的大小呢？答案是：对于系统自有的数据类型，语言本身就能区分内存块的大小，而对于自定义数据类型（如我们自定义的类），则 operator new 和 operator delete 之间需要互相传递信息。当我们使用 operator new 为一个自定义类型对象分配内存时，实际上我们得到的内存要比实际对象的内存大一些，这些内存除了要存储对象数据外，还需要记录这片内存的大小，此方法称为 cookie。这一点上的实现依据不同的编译器不同。例如 MFC 选择在所分配内存的头部存储对象实际数据，而后面的部分存储边界标志和内存大小信息。当我们使用 delete operator 进行内存释放操作时，delete operator 就可以根据这些信息正确的释放指针所指向的内存块。
-
-当我们为数组分配/释放内存时，虽然我们仍然使用 new operator 和 delete operator，但是其内部行为却有不同：new operator 调用了operator new 的数组版的兄弟－ operator new[]，而后针对每一个数组成员调用构造函数。而 delete operator 先对每一个数组成员调用析构函数，而后调用 operator delete[] 来释放内存。需要注意的是，当我们创建或释放由自定义数据类型所构成的数组时，编译器为了能够标识出在 operator delete[] 中所需释放的内存块的大小，也使用了编译器相关的 cookie 技术。
-
-（2）内存检测的基本实现原理
----
-上文提到要想检测内存泄漏，就必须对程序中的内存分配和释放情况进行记录，所能够采取的办法就是重载所有形式的operator new 和 operator delete，截获 new operator 和 delete operator 执行过程中的内存操作信息。下面列出的就是重载形式
-```
-1 void* operator new( size_t nSize, char* pszFileName, int nLineNum )
-2 void* operator new[]( size_t nSize, char* pszFileName, int nLineNum )
-3 void operator delete( void *ptr )
-4 void operator delete[]( void *ptr )
-```
-我们为 operator new 定义了一个新的版本，除了必须的 size_t nSize 参数外，还增加了文件名和行号，这里的文件名和行号就是这次 new operator 操作符被调用时所在的文件名和行号，这个信息将在发现内存泄漏时输出，以帮助用户定位泄漏具体位置。对于 operator delete，参数相同，所以覆盖了之前的 operator delete 版本。此外，我们利用STL的map，以指针值为 key 值，文件名和行号为value。那么内存检测的原理就分为两步，第一步让 new operator 将内存分配代码所在的文件名和行号传递给我们重载的 operator new；第二步创建用于存储内存数据的 map 数据结构，管理，在合适时机打印内存泄漏信息。
-
-针对第一步：首先我们可以利用 C 的预编译宏__FILE__ 和__LINE__，这两个宏将在编译时在指定位置展开为该文件的文件名和该行的行号。而后我们需要将缺省的全局 new operator 替换为我们自定义的能够传入文件名和行号的版本，我们在子系统头文件 MemRecord.h 中定义，而后在所有需要使用内存检测的客户程序的所有的 cpp 文件的开头加入。就可以将客户源文件中的对于全局缺省的 new operator 的调用替换为 new（__FILE__ 和__LINE__) 调用，而该形式的new operator将调用我们的operator new (size_t nSize, char* pszFileName, int nLineNum)，其中 nSize 是由 new operator 计算并传入的，而 new 调用点的文件名和行号是由我们自定义版本的 new operator 传入的。我们建议在所有用户自己的源代码文件中都加入上述宏，如果有的文件中使用内存检测子系统而有的没有，则子系统将可能因无法监控整个系统而输出一些泄漏警告。
-
 #include "MemRecord.h"中定义：
 ```
 #define DEBUG_NEW new(__FILE__, __LINE__ )
@@ -280,7 +259,7 @@ _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 _CrtSetBreakAlloc(long); 
 ```
 
-常用的智能指针介绍？ 两个智能指针相互引用造成的内存泄漏原理？
+7.2 常用的智能指针介绍？智能指针怎么防止内存泄漏的？ 两个智能指针相互引用造成的内存泄漏原理？
 ---
 https://github.com/Planck-a/skill/blob/master/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88.md
 
