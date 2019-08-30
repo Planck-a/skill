@@ -6,7 +6,8 @@ git commit-m "添加新文件"
 git push origin master   //添加到远程的master分支
 ```
 
-
+远程仓库到本地仓库进行合并
+---
 - git fetch
 - git fetch -p
 - git merge
@@ -14,7 +15,8 @@ git push origin master   //添加到远程的master分支
 - git clone
 
 
-
+远程分支到本地的合并
+---
 - git branch-a
 - git branch-r
 - git checkout-b 本地分支 远程分支
