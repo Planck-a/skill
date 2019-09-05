@@ -1072,19 +1072,19 @@ Are "inline virtual" member functions ever actually "inlined"?
 内联是在编译器建议编译器内联，而虚函数的多态性在运行期，编译器无法知道运行期调用哪个代码，因此虚函数表现为多态性时（运行期）不可以内联。
 inline virtual 唯一可以内联的时候是：编译器知道所调用的对象是哪个类（如 Base::who()），这只有在编译器具有实际对象而不是对象的指针或引用时才会发生。
 
-27.exrern关键字的作用？      
+27.exrern “Ｃ”关键字的作用？      
 ---
+为了在C++文件中包含一些C写的文件，比如memset。为了兼容C，C++使用ifdef作为开关在C++文件重新编译该函数，添加一些符号修饰！
 ```
-#ifndef __INCvxWorksh
-#define __INCvxWorksh 
-#ifdef __cplusplus              //为了在c语言中调用c++
-extern "C" {
-#endif 
-/*...*/ 
 #ifdef __cplusplus
+extern "C"{
+#endif
+ 
+void * memset(void * ,int,size_t);
+ 
+#ifdef "__cplusplus"
 }
-#endif 
-#endif /* __INCvxWorksh */
+
 ```
 答：一、 C++中调用C编译好的函数，通过extern "C" void fun(int a, int b)，告诉c++编译器在编译时按照c格式进行编译。C++语言支持函数重载，C语言不支持函数重载，函数被C++编译器编译后在库中的名字与C语言的不同，假设某个函数原型为：
 
@@ -1092,7 +1092,16 @@ extern "C" {
 	  
 该函数被C编译器编译后在库中的名字为:  _foo。而C++编译器则会产生像: _foo_int_int之类的名字。_foo_int_int这样的名字包含了函数名和函数参数数量及类型信息，C++就是靠这种机制来实现函数重载的。 为了实现C和C++的混合编程，C++提供了C连接交换指定符号extern "C"来解决名字匹配问题，函数声明前加上extern "C"后，则编译器就会按照C语言的方式将该函数编译为_foo，这样C语言中就可以调用C++的函数了。
 
-二、extern修饰变量或者函数，作用是声明函数或者变量的作用范围，如A模块中的 extern int g_Int，只要在B模块包含了A的头文件，那么B就可以正常使用，在编译阶段起作用。但是有一点要注意，在使用extern时候要严格对应声明时的格式，比如A中定义char a[6]，B中定义extern char *a，那么会报错，因为没有严格匹配。
+
+extern关键字的作用
+---
+extern修饰变量或者函数，作用是声明函数或者变量的作用范围
+
+修饰函数：函数的声明extern关键词是可有可无的，因为函数本身不加修饰的话就是extern的。
+
+修饰变量：
+
+如A模块中的 extern int g_Int，只要在B模块包含了A的头文件，那么B就可以正常使用，在编译阶段起作用。但是有一点要注意，在使用extern时候要严格对应声明时的格式，比如A中定义char a[6]，B中定义extern char *a，那么会报错，因为没有严格匹配。
 
 28 、volatile有什么作用？   --------》explicit
 ---
