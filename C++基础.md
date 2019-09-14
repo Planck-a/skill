@@ -1402,6 +1402,22 @@ cout<<sizeof(a)<<endl;//指针 ，结果是4
 int a[3]={1,2,3};
 cout<<sizeof(a)<<endl;//3*4=12
 
+char* ss = "0123456789";
+sizeof(ss) 结果 4 ＝＝＝》ss是指向字符串常量的字符指针
+sizeof(*ss) 结果 1 ＝＝＝》*ss是第一个字符
+
+char ss[] = "0123456789";
+sizeof(ss) 结果 11 ＝＝＝》ss是数组，计算到\0位置，因此是10＋1
+sizeof(*ss) 结果 1 ＝＝＝》*ss是第一个字符
+
+char ss[100] = "0123456789";
+sizeof(ss) 结果是100 ＝＝＝》ss表示在内存中的大小 100×1
+strlen(ss) 结果是10 ＝＝＝》strlen是个函数内部实现是用一个循环计算到\0为止之前
+
+int ss[100] = "0123456789";
+sizeof(ss) 结果 400 ＝＝＝》ss表示再内存中的大小 100×4
+strlen(ss) 错误 ＝＝＝》strlen的参数只能是char* 且必须是以''\0''结尾的
+
 int a=10;
 int &b=a;
 cout<<sizeof(b)<<endl;//引用的结果是它指向地址的内存大小
