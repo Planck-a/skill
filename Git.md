@@ -11,15 +11,15 @@ git push origin master   //添加到远程的master分支
 ```
 
 - 远程仓库到本地仓库进行合并
-
+```
 - git fetch
 - git fetch -p
 - git merge
 - git pull
 - git clone
-
+```
 - 远程分支到本地的合并
-
+```
 - git branch-a
 - git branch-r
 - git checkout-b 本地分支 远程分支
@@ -29,21 +29,20 @@ git push origin master   //添加到远程的master分支
 - git branch 新分支名
 - git cheacout 本地创建好的分支
 - git cheakout HEAD^ -- 要恢复的文件名
-
-
+```
 
 提纲的解释
 ----
 - 远程仓库到本地仓库进行合并
-
+```
 - git fetch      查看远程仓库
 - git fetch -p   查看远程仓库，以远程仓库为标准，本地向远程从仓库对齐
 - git merge    
 - git pull       相当于fetch+merge
 - git clone
-
+```
 - 远程分支到本地的合并
-
+```
 - git branch-a    查看远程和本地所有的分支
 - git branch-r    查看远程分支
 - git checkout-b 本地分支 远程分支      把远程分支拉到本地
@@ -53,7 +52,7 @@ git push origin master   //添加到远程的master分支
 - git branch 新分支名                  创建新分支
 - git cheacout 本地创建好的分支         切换到另一个分支去
 - git cheakout HEAD^ -- 要恢复的文件名
-
+```
 
 问题一：git merge和 git rebase的区别是什么？
 ---
