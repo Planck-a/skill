@@ -1,5 +1,7 @@
 提纲：
 ---
+
+-初始化
 ```
 git init
 git remote add origin 远程仓库地址  //origin是默认主机名
@@ -8,16 +10,16 @@ git commit-m "添加新文件"
 git push origin master   //添加到远程的master分支
 ```
 
-远程仓库到本地仓库进行合并
----
+-远程仓库到本地仓库进行合并
+
 - git fetch
 - git fetch -p
 - git merge
 - git pull
 - git clone
 
-远程分支到本地的合并
----
+-远程分支到本地的合并
+
 - git branch-a
 - git branch-r
 - git checkout-b 本地分支 远程分支
@@ -32,16 +34,16 @@ git push origin master   //添加到远程的master分支
 
 提纲的解释
 ----
-远程仓库到本地仓库进行合并
----
+-远程仓库到本地仓库进行合并
+
 - git fetch      查看远程仓库
 - git fetch -p   查看远程仓库，以远程仓库为标准，本地向远程从仓库对齐
 - git merge    
 - git pull       相当于fetch+merge
 - git clone
 
-远程分支到本地的合并
----
+-远程分支到本地的合并
+
 - git branch-a    查看远程和本地所有的分支
 - git branch-r    查看远程分支
 - git checkout-b 本地分支 远程分支      把远程分支拉到本地
