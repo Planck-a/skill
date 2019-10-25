@@ -18,6 +18,7 @@
  * [程序分析题](#程序分析题)
  * [各种锁机制](#各种锁机制)
  * [exit和_exit区别](#exit和_exit区别)
+ * [仿函数](#仿函数)
  
  
  
@@ -2224,5 +2225,15 @@ C++的参数是从右到左入栈的，第一个参数在栈顶。
 
 56、字典树
 ---
+
+## 仿函数
+```
+template<typename T>
+struct plus:public binarry_function<T,T>{
+    T operator()(const T& x,const T& y){
+        return x+y;
+    }
+}
+```
 
 
