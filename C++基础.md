@@ -2,7 +2,13 @@
  * [单例模式](#单例模式) 
  * [指针和引用的区别](#指针和引用的区别) 
  * [new和delete的底层实现](#new和delete的底层实现) 
- * [怎么限制一个类的对象实例,只能在堆上分配,或者只能在栈上分配](#怎么限制一个类的对象实例,只能在堆上分配,或者只能在栈上分配) 
+ * [限制一个类只能在堆上分配或者只能在栈上分配](#限制一个类只能在堆上分配或者只能在栈上分配) 
+ * [string类](#string类) 
+ * [strcpy](#strcpy) 
+ * [strncpy](#strncpy)
+ * [memcpy](#memcpy)
+  
+ 
  
  
 
@@ -270,7 +276,7 @@ _CrtSetBreakAlloc(long);
 ![智能指针](https://github.com/Planck-a/skill/blob/master/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88.md)
 
 ## 8、怎么限制一个类的对象实例,只能在"堆"上分配,或者只能在"栈"上分配
-## 怎么限制一个类的对象实例,只能在堆上分配,或者只能在栈上分配
+## 限制一个类只能在堆上分配或者只能在栈上分配
 ---
 定义类对象有两种方式，A a和A *a=new A；
 
@@ -551,7 +557,7 @@ int (*p)(int)//函数指针`
 
 虚函数、多重继承和虚继承
 ---
-[虚函数和虚继承](https://github.com/Planck-a/skill/blob/master/C%2B%2B/%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E7%BB%A7%E6%89%BF.md)
+![虚函数和虚继承](https://github.com/Planck-a/skill/blob/master/C%2B%2B/%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E7%BB%A7%E6%89%BF.md)
 
 继承的几种方式：
 ---
@@ -676,7 +682,8 @@ C++构造函数和析构函数中可以调用虚函数吗？
 
    当实例化一个子类对象时，首先进行基类部分的构造，然后再进行派生类部分的构造。即创建Derive对象时，会先调用Base的构造函数，再调用Derive的构造函数。当在基类构造函数时，派生类还没被完全创建，从某种意义上讲此时它只是个基类对象。即当Base::Base()执行时Derive对象还没被完全创建，此时它被当成一个Base对象，而不是Derive对象，因此Foo永远绑定的是Base的Foo，失去了函数重载的效果。
 
-18.手写string类
+## 18.手写string类
+## string类
 ---
 ```cpp
 #include "StringRealize.h"
@@ -817,17 +824,8 @@ std::ostream& operator>>(std::ostream& os, const StringRealize& str)
   ::a = 2;    //给全局变量赋值
   cout<<"a = "<<::a<<endl;
 ```
-20.不调用C/C++ 的字符串库函数，编写strcpy
----
-   char * strcpy(char * strDest,const char * strSrc)
-        {
-                if ((strDest==NULL)||strSrc==NULL))                     
-                   return NULL;    
-                char * strDestCopy=strDest; 
-                while ((*strDest++=*strSrc++)!='\0'); 
-                *strDest = '\0';//必须自己手动加\0，不然会乱码！！
-                return strDestCopy;
-        }
+# 20.strcpy、考虑内存重叠的strcpy、strncpy、memcpy
+
 strcpy 有什么危险？
 ---
 答：strcpy 不检查copy目标串的Size，如果目标空间不够，就有BufferOverflow问题。如果在用的时候加上相关的长度判断，则会大大降低出此错误的危险。
@@ -845,6 +843,116 @@ strncpy
 strncpy(dest, src, sizeof(dest))；//链式编程，返回值是des
 
 dest[sizeof(dest)-1] = ‘\0’;//务必要把dest的最后一个字节手工设置为0. 因为strncpy仅在src的长度小于dest时，对剩余的字节填0；如果des较小时，手动在最后一位补\0并覆盖最后一位。
+
+
+## strcpy
+```
+char *strcpy(char *strDes, const char *string)//源字符串不可变const
+{
+	if (string == NULL && strDes == NULL)
+		return NULL;
+	char* address = strDes;
+	while (*string != '\0')
+		*(strDes++) = *(string++);
+	*strDes = '\0';//一定注意最后结束时一定要加一个\0结尾；
+	return address;//strDes 此时已经不在开始位置了
+}
+```
+//考虑内存重叠后安全的版本
+```
+char *mystrcpy2(char *strDest, const char *strSrc)
+{
+	assert((strDest != NULL) && (strSrc != NULL));
+ 
+	char *ret = strDest;
+	char *d, *s;
+	int size = 0;
+	d = (char *)strDest;
+	s = (char *)strSrc;
+ 
+	size = strlen(strSrc) + 1;
+	printf("size = %d\n", size);
+	if (strDest >= strSrc && strDest <= strSrc + size) {
+		d += size - 1;
+		s += size - 1;
+		while (size--){
+			*d-- = *s--;
+		}
+	}
+	else {
+		while (size--)
+			*strDest++ = *strSrc++;
+	}
+ 
+	return ret;
+}
+```
+
+## strncpy
+
+```
+char *strncpy(char *dst, const char *src, size_t len)
+{
+    assert(des != NULL && src != NULL);
+    int offset = 0;
+    char *ret = dst;
+    char *tmp;
+    if(strlen(src) < len)
+    {
+        offset = len - strlen(src);
+        len = strlen(src);
+    }
+    if(dst >= src && dst <= src + len -1)
+    {
+        dst = dst + len - 1;
+        src = src + len - 1;
+        tmp = dst;
+        while(len--)
+            *dst-- = *src--;
+    }
+    else
+    {
+        while(len--)
+            *dst++ = *src++;
+        tmp = dst;
+    }
+    while(offset--)
+        *tmp++ = '\0';
+    return ret;
+}
+	
+```
+## memcpy
+```
+void *my_memcpy(char *dest,const char *src,size_t n)
+{
+    assert(NULL != dest);
+    assert(NULL != src);
+    char *res = (char*)dest;
+
+
+    char *p = (char*)dest;
+    const char *q = (const char*)src;
+    if(p <= q || p >= q+n)
+    {
+        while(n--)
+        {
+            *p++ = *q++;
+        }
+    }
+    else
+    {
+        p = p+n-1;
+        q = q+n-1;
+        while(n--)
+        {
+            *p-- = *q--;
+        }
+    }
+    return res;
+}
+
+```
 
 21、C语言中变量的存储类型有哪些
 ---
