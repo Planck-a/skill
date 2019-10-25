@@ -1,6 +1,8 @@
  * [C和C++区别](#1、C和C++区别) (`easy` `数学`)
  * [单例模式](#单例模式) 
  * [指针和引用的区别](#指针和引用的区别) 
+ * [new和delete的底层实现](#new和delete的底层实现) 
+ 
 
 
 
@@ -181,8 +183,8 @@ delete[]mTest2;//-4-  报错
 
 7.1 内存检测的基本实现原理
 ---
-new和delete的底层实现
----
+## new和delete的底层实现
+
 当我们在程序中写下 new 和 delete 时，我们实际上调用的是 C++ 语言内置的 new operator 和 delete operator。以 new operator 为例，它总是先分配足够的内存，而后再调用相应的类型的构造函数初始化该内存。new operator 为分配内存所调用的函数名字是 operator new，其通常的形式是 void * operator new(size_t size); 其返回值类型是 void*，参数 size 确定分配多少内存，你能增加额外的参数重载函数 operator new，但是第一个参数类型必须是 size_t。
 
 这里有一个问题，就是当我们调用 new operator 分配内存时，有一个 size 参数表明需要分配多大的内存。但是当调用 delete operator 时，却没有类似的参数，那么 delete operator 如何能够知道需要释放该指针指向的内存块的大小呢？答案是：对于系统自有的数据类型，语言本身就能区分内存块的大小，而对于自定义数据类型（如我们自定义的类），则 operator new 和 operator delete 之间需要通过cookie互相传递信息。当我们使用 operator new 为一个自定义类型对象分配内存时，实际上我们得到的内存要比实际对象的内存大一些，这些内存除了要存储对象数据外，还需要记录这片内存的大小，此方法称为 cookie。
@@ -263,7 +265,7 @@ _CrtSetBreakAlloc(long);
 
 7.2 常用的智能指针介绍？智能指针怎么防止内存泄漏的？ 两个智能指针相互引用造成的内存泄漏原理？
 ---
-https://github.com/Planck-a/skill/blob/master/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88.md
+[智能指针](#https://github.com/Planck-a/skill/blob/master/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88.md)
 
 8、怎么限制一个类的对象实例,只能在"堆"上分配,或者只能在"栈"上分配
 ---
