@@ -7,6 +7,7 @@
  * [strcpy](#strcpy) 
  * [strncpy](#strncpy)
  * [memcpy](#memcpy)
+ * [内联函数inline](#内联函数inline)
  * [static的使用场景](#static的使用场景)
  * [const的使用场景](#const的使用场景)
  * [const与#define的区别](#const与#define的区别)
@@ -1151,6 +1152,7 @@ B.考察能否合理运用条件运算符;
 
 26 内联函数inline
 ---
+## 内联函数inline
 特征
 
 - 相当于把内联函数里面的内容写在调用内联函数处，n次调用就有n次展开；相当于宏，却比宏多了类型检查，真正具有函数特性；
