@@ -132,6 +132,22 @@ void main()
 }
 ```
 
+三、C++11下单例模式最简单的写法，利用静态局部变量的线程安全性
+```
+class Foo
+{
+public:
+    static Foo *getInstance()
+    {
+        static Foo s_instance;
+        return &s_instance;
+    }
+private:
+    Foo() {}
+};
+
+```
+
 ## 4、指针和引用的区别
 ##  指针和引用的区别
 
