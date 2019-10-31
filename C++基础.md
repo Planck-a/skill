@@ -147,6 +147,25 @@ private:
 };
 
 ```
+四、模板单例模式
+```
+template<class T> 
+class Singletion 
+{ 
+public: 
+static T* GetInstance() {
+     static T m_Instance;
+     return &m_Instance; 
+} 
+
+private: 
+    Singletion(){};
+    Singletion(const Singletion& ){}; 
+    Singletion& operator=(const Singletion&){};  
+    virtual ~Singletion(){}; 
+}; 
+
+```
 
 ## 4、指针和引用的区别
 ##  指针和引用的区别
