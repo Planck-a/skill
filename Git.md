@@ -35,11 +35,11 @@ git push origin master   //添加到远程的master分支
 ----
 - 远程仓库到本地仓库进行合并
 ```
-- git fetch      查看远程仓库
+- git fetch      查看远程仓库，不会自动的merge；
 - git fetch -p   查看远程仓库，以远程仓库为标准，本地向远程从仓库对齐
 - git merge    
-- git pull       相当于fetch+merge
-  git push     命令用于将本地分支的更新，推送到远程主机。
+- git pull       相当于fetch+merge，所以相比起来fetch更为安全，因为可以先比较本地和远程仓库，再决定要不要merge
+  git push      命令用于将本地分支的更新，推送到远程主机。默认推送到master
 - git clone
 ```
 - 远程分支到本地的合并
@@ -57,4 +57,5 @@ git push origin master   //添加到远程的master分支
 
 问题一：git merge和 git rebase的区别是什么？
 ---
-答：举一个场景来说明，从master分支新建一个分支branch1处理任务，代码写到一半，通知到master分支创建紧急任务分支branch2。这时应先stash暂存，然后切换到master，checkout-b branch2，做完紧急任务后提交到master分支。这时的head指针指向的是branch2，如果我们希望合并branch1和branch2，就有两种合并手段：rebase和merge。merge是新建一个节点分别指向branch1和branch2；而rebase是找到branch1和branch2最前面的那个分支点，把分支点到branch1的所有节点，移植到branch2后边。
+答：举一个场景来说明，从master分支新建一个分支branch1处理任务，代码写到一半，通知到master分支创建紧急任务分支branch2。这时应先stash暂存，然后切换到master，checkout-b branch2，做完紧急任务后提交到master分支。回到branch1后通过git stash pop，可以找回刚刚stash的代码。
+这时的head指针指向的是branch2，如果我们希望合并branch1和branch2，就有两种合并手段：rebase和merge。merge是新建一个节点分别指向branch1和branch2；而rebase是找到branch1和branch2最前面的那个分支点，把分支点到branch1的所有节点，移植到branch2后边。
