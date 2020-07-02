@@ -39,6 +39,7 @@ git push origin master   //添加到远程的master分支
 - git fetch -p   查看远程仓库，以远程仓库为标准，本地向远程从仓库对齐
 - git merge    
 - git pull       相当于fetch+merge
+  git push     命令用于将本地分支的更新，推送到远程主机。
 - git clone
 ```
 - 远程分支到本地的合并
