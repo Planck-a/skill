@@ -8,17 +8,18 @@ git status
 git add  //添加文件进暂存区
 git commit-m "添加新文件"   //将暂存区文件添加到仓库中
 
-git remote add origin 远程仓库地址  //origin是默认主机名
+git remote add origin [远程仓库地址]  //origin是默认远程仓库主机名
 git push origin master   //添加到远程的master分支
 ```
 
 - 远程仓库到本地仓库进行合并
+  - 远程仓库就是一个中心仓库，比如github，每个员工都可以从这个中心仓库clone到本地
 ```
 - git fetch      查看远程仓库，不会自动的merge；
 - git fetch -p   查看远程仓库，以远程仓库为标准，本地向远程从仓库对齐
 - git merge    
 - git pull       相当于fetch+merge，所以相比起来fetch更为安全，因为可以先比较本地和远程仓库，再决定要不要merge
-  git push      命令用于将本地分支的更新，推送到远程主机。默认推送到master
+  git push      命令用于将本地分支的更新，推送到远程主机。默认推送到远端的master；第一次推送的时候加上-u参数，可以把本地master分支和远程的master分支关联起来，以后push就简单了
 - git clone
 ```
 
