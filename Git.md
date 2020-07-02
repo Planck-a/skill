@@ -36,6 +36,23 @@ git push origin master   //添加到远程的master分支
 - git cheakout HEAD^ -- 要恢复的文件名
 ```
 
+- git 标签
+  - 标签的目的是为了给commit起一个好记的名字，比如今天commit了10次，我希望将第9次commit定义为 v 1.0，就要用到标签
+```
+git branch   查看本地所有分支
+git checkout master   切换到目标分支，不论master或者是dev都可以打标签
+git tag v1.0    给当前版本打标签为v1.0
+git tag 
+git show v1.0  查看该版本对应的commit等详细信息
+
+//如何给之前的某次commit定义一个tag
+git log  //先通过log查询某次commit的commit_id
+git tag v0.9 f52c633  //给该次commit定义tag
+git tag
+git show v0.9
+
+```
+
 问题一：git merge和 git rebase的区别是什么？
 ---
 答：举一个场景来说明，从master分支新建一个分支branch1处理任务，代码写到一半，通知到master分支创建紧急任务分支branch2。这时应先stash暂存，然后切换到master，checkout-b branch2，做完紧急任务后提交到master分支。回到branch1后通过git stash pop，可以找回刚刚stash的代码。
