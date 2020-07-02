@@ -3,36 +3,15 @@
 
 - 初始化
 ```
-git init
-git remote add origin 远程仓库地址  //origin是默认主机名
+git init    //自己创建一个空文件夹，cd进该文件夹，然后git init 该文件才能具有git管理功能
 git status
-git commit-m "添加新文件"
+git add  //添加文件进暂存区
+git commit-m "添加新文件"   //将暂存区文件添加到仓库中
+
+git remote add origin 远程仓库地址  //origin是默认主机名
 git push origin master   //添加到远程的master分支
 ```
 
-- 远程仓库到本地仓库进行合并
-```
-- git fetch
-- git fetch -p
-- git merge
-- git pull
-- git clone
-```
-- 远程分支到本地的合并
-```
-- git branch-a
-- git branch-r
-- git checkout-b 本地分支 远程分支
-- git checkout 远程分支
-- git cheacout 本地分支
-- git cheakout -b 新分支名
-- git branch 新分支名
-- git cheacout 本地创建好的分支
-- git cheakout HEAD^ -- 要恢复的文件名
-```
-
-提纲的解释
-----
 - 远程仓库到本地仓库进行合并
 ```
 - git fetch      查看远程仓库，不会自动的merge；
@@ -42,6 +21,7 @@ git push origin master   //添加到远程的master分支
   git push      命令用于将本地分支的更新，推送到远程主机。默认推送到master
 - git clone
 ```
+
 - 远程分支到本地的合并
 ```
 - git branch-a    查看远程和本地所有的分支
