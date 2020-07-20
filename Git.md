@@ -12,6 +12,20 @@ git remote add origin [远程仓库地址]  //origin是默认远程仓库主机�
 git push origin master   //添加到远程的master分支
 ```
 
+- 查看提交日志
+ ```
+ git log
+ git reflog  //查看历史的操作日志，比log更详细
+ q
+ ```
+
+- 版本回退和前进
+```
+
+git reset --hard HEAD^     //回到上一个版本
+git reset --hard 1094a     //回到指定版本号的版本，可以是向前，也可以是向后
+```
+
 - 远程仓库到本地仓库进行合并
   - 远程仓库就是一个中心仓库，比如github，每个员工都可以从这个中心仓库clone到本地
 ```
