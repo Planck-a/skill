@@ -12,6 +12,7 @@
 ### 1、线程异常的捕获
 <details><summary>当你在main thread中调用 sub thread时，如果main thread出现异常，导致未能及时调用sub thread的join()，可能会引发未知问题。</summary>
 示例如下：
+ 
 ```c++
 void func_main(){
     std::thread t(myfunc);
@@ -61,5 +62,39 @@ void func_main(){
 </details>
 
 ### 2、传递参数给线程
+
+线程函数默认是按值传递参数，根据thread构造函数传进来的参数，在类内部生成一份副本，再将该副本按照线程函数要求的传值or引用进行传递，这样会引发的问题有两个，第一是不会进行隐式类型转换，导致指针类型的浅拷贝问题，第二个是引用失效问题。
+
+示例1：
+```c++
+void f(int i,std::string const& s);
+void main_thread(){
+    char buffer[1024];
+    sprinf(buffer,"%i",some_param);
+    std::thread t(f,3,buffer); //期望是传引用，实际buffer在main_thread调用结束就会析构，buffer指向的内存地址会被清空，t中若访问s就会发生未定义行为
+    //std::thread t(f,3,std::string(buffer));  正确做法是由std::string 生成临时变量，去托管buffer
+    t.detach();
+}
+```
+
+示例2：ref来显示声明引用
+```
+std::thread t(update_data,std::ref(data));
+
+```
+
+参数传递还有一点需要注意，如果线程函数参数是movable，但不是copyable。比如unique_ptr需要在构造函数中指定std::move(p)
+
+```c++
+void process_big_object(std::unique_ptr<big_object> a);
+
+{
+    std::unique_ptr<big_object> p(new big_object);
+    p->prepare_data(42);
+    std::thread t(process_big_object,std::move(p));
+}
+
+```
+
 
 ### 3、线程绑核
