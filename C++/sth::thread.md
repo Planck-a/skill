@@ -10,7 +10,8 @@
 
 ## 管理线程
 ### 1、线程异常的捕获
-当你在main thread中调用 sub thread时，如果main thread出现异常，导致未能及时调用sub thread的join()，可能会引发未知问题。示例如下：
+<details><summary>当你在main thread中调用 sub thread时，如果main thread出现异常，导致未能及时调用sub thread的join()，可能会引发未知问题。</summary>
+示例如下：
 ```c++
 void func_main(){
     std::thread t(myfunc);
@@ -57,7 +58,7 @@ void func_main(){
     do_something_in_current_thread();//异常发生地点
 }
 ```
-
+</details>
 
 ### 2、传递参数给线程
 
